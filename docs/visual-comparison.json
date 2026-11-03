@@ -1,0 +1,30 @@
+[
+  {
+    "screen": "start",
+    "mean_absolute_rgb_error": 0.499,
+    "rgb_similarity_percent": 99.8,
+    "content_band_rgb_similarity_percent": 99.44,
+    "pixels_with_all_channels_within_24_percent": 99.15
+  },
+  {
+    "screen": "onboarding_1",
+    "mean_absolute_rgb_error": 1.42,
+    "rgb_similarity_percent": 99.44,
+    "content_band_rgb_similarity_percent": 99.38,
+    "pixels_with_all_channels_within_24_percent": 98.46
+  },
+  {
+    "screen": "onboarding_2",
+    "mean_absolute_rgb_error": 1.595,
+    "rgb_similarity_percent": 99.37,
+    "content_band_rgb_similarity_percent": 99.31,
+    "pixels_with_all_channels_within_24_percent": 98.36
+  },
+  {
+    "screen": "onboarding_3",
+    "mean_absolute_rgb_error": 0.754,
+    "rgb_similarity_percent": 99.7,
+    "content_band_rgb_similarity_percent": 99.67,
+    "pixels_with_all_channels_within_24_percent": 99.0
+  }
+]

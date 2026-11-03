@@ -1,0 +1,5 @@
+<resources>
+    <style name="Theme.UTHTodo" parent="Theme.UTHTodo.Base">
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+</resources>

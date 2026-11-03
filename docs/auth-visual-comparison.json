@@ -1,0 +1,23 @@
+[
+  {
+    "screen": "login",
+    "mean_absolute_rgb_error": 2.981,
+    "rgb_similarity_percent": 98.83,
+    "pixels_with_all_channels_within_24_percent": 96.46,
+    "reference": "reference_login_two_providers.png"
+  },
+  {
+    "screen": "home",
+    "mean_absolute_rgb_error": 2.169,
+    "rgb_similarity_percent": 99.15,
+    "pixels_with_all_channels_within_24_percent": 97.08,
+    "reference": "reference_home.png"
+  },
+  {
+    "screen": "profile",
+    "mean_absolute_rgb_error": 1.368,
+    "rgb_similarity_percent": 99.46,
+    "pixels_with_all_channels_within_24_percent": 98.22,
+    "reference": "reference_profile.png"
+  }
+]

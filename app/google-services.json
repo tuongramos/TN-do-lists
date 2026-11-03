@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "504485499098",
+    "project_id": "to-do-lists-a558c",
+    "storage_bucket": "to-do-lists-a558c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:504485499098:android:d5750010fdaa63ce0e95e3",
+        "android_client_info": {
+          "package_name": "vn.edu.uth.todo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "504485499098-d8d9pqo8tqs13nub2ihkos7u9t8r0o7v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "vn.edu.uth.todo",
+            "certificate_hash": "dff5e39b3604479bee03eab1f935a32dce923340"
+          }
+        },
+        {
+          "client_id": "504485499098-dj4ob8ctp4urkhu0j6gnf2ck60c4fpal.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQ1nN68h4RDl1aUczNrZsXjP7JOcIHODc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "504485499098-dj4ob8ctp4urkhu0j6gnf2ck60c4fpal.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

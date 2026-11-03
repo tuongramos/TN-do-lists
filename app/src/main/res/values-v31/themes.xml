@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.UTHTodo" parent="Theme.UTHTodo.Base">
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <item name="android:windowSplashScreenBackground">#2F5BEA</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@android:color/transparent</item>
+    </style>
+</resources>
