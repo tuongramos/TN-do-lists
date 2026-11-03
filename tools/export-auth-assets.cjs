@@ -63,7 +63,6 @@ for(const name of ['login','home','profile']) {
   source = source.replace(/<g filter="url\(#filter0[^>]*>/,'<g>');
   source = source.replace(/<g clip-path="url\(#clip0[^>]*>/,'<g>');
   source = source.replace(/width="396" height="879" viewBox="0 0 396 879"/,'width="390" height="844" viewBox="3 31 390 844"');
-  render(source,path.join(input,`reference_${name}.png`),1);
   if(name==='login') {
     // Explicit user-requested addition: Google at y=528 and Facebook at y=598.
     const start = source.indexOf('<g filter="url(#filter2');
@@ -72,6 +71,8 @@ for(const name of ['login','home','profile']) {
     const google = `<g transform="translate(0 -70)">${original}</g>`;
     const facebook = original.replace(/>G<\/tspan>/,'>f</tspan>').replace('>Ti&#x1ebf;p t&#x1ee5;c v&#x1edb;i Google</tspan>','>Ti&#x1ebf;p t&#x1ee5;c v&#x1edb;i Facebook</tspan>').replace('x="134.449"','x="124"').replace('x="96.5"','x="86.5"').replace('x="104.26"','x="94.26"');
     render(source.slice(0,start)+google+facebook+source.slice(end),path.join(input,'reference_login_two_providers.png'),1);
+  } else {
+    render(source,path.join(input,`reference_${name}.png`),1);
   }
 }
 console.log('Exported original icons, login logo, add button and three auth references.');

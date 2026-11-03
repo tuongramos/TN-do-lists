@@ -26,7 +26,7 @@ Các test Android kiểm tra nút Tiếp tục, Bỏ qua, Bắt đầu ngay, d�
 Độ tương đồng RGB tính bằng `100 × (1 − MAE/255)`. Đây là thước đo sai khác màu, không phải thang điểm cảm nhận thị giác. Đã kiểm tra trực quan ảnh đặt cạnh nhau: hình minh họa, logo, nội dung, màu, vị trí, ngắt dòng, dấu trang và nút khớp thiết kế; khác biệt nhỏ chủ yếu ở cách raster hóa chữ và bo góc giữa SVG và Android.
 
 - `comparison.png`: bản SVG và Android đặt cạnh nhau cho đủ 4 màn.
-- `screenshots/`: ảnh chụp Android và bản chuẩn hóa.
+- `screenshots/`: ảnh chụp Android gốc dùng làm đầu vào cho công cụ đối chiếu. Công cụ chuẩn hóa trong bộ nhớ và lưu kết quả vào ảnh so sánh tổng hợp.
 - `visual-comparison.json`: số liệu so sánh.
 - `figma/`: SVG gốc và PNG tham chiếu.
 

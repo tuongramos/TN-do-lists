@@ -27,7 +27,6 @@ for name, label, reference_file in NAMES:
     width, height = round(reference.width * scale), round(reference.height * scale)
     left, top = round((actual.width - width) / 2), round((actual.height - height) / 2)
     actual = actual.crop((left, top, left + width, top + height)).resize(reference.size, Image.Resampling.LANCZOS)
-    actual.save(DOCS / "screenshots" / f"{name}_normalized.png")
     expected_pixels = np.asarray(reference).astype(float)
     actual_pixels = np.asarray(actual).astype(float)
     difference = np.abs(expected_pixels - actual_pixels)

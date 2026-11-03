@@ -24,7 +24,6 @@ for name, title in [("login", "Đăng nhập"), ("home", "Trang chủ"), ("profi
     w, h = round(390 * scale), round(844 * scale)
     x, y = round((shot.width - w) / 2), round((shot.height - h) / 2)
     actual = shot.crop((x, y, x+w, y+h)).resize((390, 844), Image.Resampling.LANCZOS)
-    actual.save(SHOTS / f"{name}_normalized.png")
     diff = np.abs(np.asarray(reference).astype(float) - np.asarray(actual).astype(float))
     results.append({
         "screen": name,

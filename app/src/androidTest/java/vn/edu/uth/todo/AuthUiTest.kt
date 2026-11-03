@@ -58,7 +58,6 @@ class AuthUiTest {
         compose.runOnIdle { assertTrue(announcements.contains(content.labels.signedIn)) }
         compose.onNodeWithTag("home_avatar").performClick()
         compose.onNodeWithText("Đã liên kết tài khoản Facebook").assertIsDisplayed()
-        capture("profile_screen", "profile_facebook")
         compose.onNodeWithTag("logout_button").performClick()
         compose.onNodeWithTag("login_screen").assertIsDisplayed()
         compose.runOnIdle { assertNull(vm.uiState.session) }
