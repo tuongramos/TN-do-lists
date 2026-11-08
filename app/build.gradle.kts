@@ -2,6 +2,13 @@ import java.util.jar.Attributes
 import java.util.jar.JarOutputStream
 import java.util.jar.Manifest
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
+import groovy.json.JsonOutput
+
+val taskLocalProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
 
 plugins {
     id("com.android.application")
@@ -20,8 +27,14 @@ android {
         versionCode = 21
         versionName = "2.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "TASKS_API_TOKEN", JsonOutput.toJson(
+            System.getenv("TASKS_API_TOKEN") ?: taskLocalProperties.getProperty("tasks.api.token", "")))
+        buildConfigField("String", "FIREBASE_DATABASE_URL", JsonOutput.toJson(
+            System.getenv("FIREBASE_DATABASE_URL") ?: taskLocalProperties.getProperty("firebase.database.url",
+                "https://to-do-lists-a558c-default-rtdb.asia-southeast1.firebasedatabase.app")))
     }
     buildFeatures { compose = true; buildConfig = true }
+    sourceSets.getByName("androidTest").assets.srcDir("src/test/resources")
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -48,6 +61,8 @@ dependencies {
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:35.1.0"))
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.code.gson:gson:2.11.0")
 
     // Google Sign-In qua Credential Manager
     implementation("androidx.credentials:credentials:1.3.0")

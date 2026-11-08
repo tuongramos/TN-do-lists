@@ -36,7 +36,7 @@ data class LoginContent(
     val termsSuffix: String
 )
 
-enum class TaskCategory { STUDY, LIFE }
+enum class TaskCategory(val title: String) { STUDY("Học tập"), LIFE("Cuộc sống") }
 
 data class CategorySummary(
     val category: TaskCategory,
@@ -54,8 +54,8 @@ data class TodoTask(
 )
 
 data class DailyProgress(val completed: Int, val total: Int) {
-    init { require(total > 0 && completed in 0..total) }
-    val fraction: Float get() = completed.toFloat() / total
+    init { require(total >= 0 && completed in 0..total) }
+    val fraction: Float get() = if (total == 0) 0f else completed.toFloat() / total
     val percent: Int get() = kotlin.math.round(fraction * 100).toInt()
     val label: String get() = "$completed/$total việc"
 }
@@ -124,5 +124,8 @@ data class TodoUiState(
     val notice: UiNotice? = null,
     val announcement: String? = null,
     val googleSignInRequest: GoogleSignInRequest? = null,
-    val facebookSignInRequest: FacebookSignInRequest? = null
+    val facebookSignInRequest: FacebookSignInRequest? = null,
+    val taskBoard: TaskBoard = TaskBoard(emptyList()),
+    val taskStatus: TaskDataStatus = TaskDataStatus(),
+    val detailStatus: TaskDetailStatus = TaskDetailStatus()
 )

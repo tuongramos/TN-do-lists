@@ -12,6 +12,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -35,6 +38,19 @@ import vn.edu.uth.todo.ui.OnboardingScreen
 import vn.edu.uth.todo.ui.TodoViewModel
 import vn.edu.uth.todo.ui.StartScreen
 import vn.edu.uth.todo.ui.TodoTheme
+import vn.edu.uth.todo.ui.TaskListScreen
+import vn.edu.uth.todo.ui.TaskDetailScreen
+import vn.edu.uth.todo.ui.TaskDetailUnavailableScreen
+import vn.edu.uth.todo.ui.TaskStatusBanner
+import vn.edu.uth.todo.data.ApiFirebaseTaskRepository
+import vn.edu.uth.todo.data.MockTaskApi
+import vn.edu.uth.todo.data.TaskApiConfiguration
+import vn.edu.uth.todo.data.FirebaseTaskStore
+import vn.edu.uth.todo.data.TaskFirebaseDatabase
+import vn.edu.uth.todo.data.SharedPreferencesTaskCache
+import vn.edu.uth.todo.model.TaskDataMessages
+import vn.edu.uth.todo.model.TaskFilter
+import vn.edu.uth.todo.model.TaskCategory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +62,10 @@ class MainActivity : ComponentActivity() {
             clearGoogleSession = googleClient::clearSession,
             clearFacebookSession = { LoginManager.getInstance().logOut() }
         )
-        val factory = TodoViewModel.factory(authRepository)
+        val tasks = ApiFirebaseTaskRepository(MockTaskApi(TaskApiConfiguration(BuildConfig.TASKS_API_TOKEN)),
+            FirebaseTaskStore { TaskFirebaseDatabase.instance(BuildConfig.FIREBASE_DATABASE_URL) },
+            SharedPreferencesTaskCache(applicationContext))
+        val factory = TodoViewModel.factory(authRepository, sync = tasks)
         val todoViewModel = ViewModelProvider(this, factory)[TodoViewModel::class.java]
         val facebookClient = FacebookSignInClient(this, todoViewModel.uiState.facebookSignInRequest?.id,
             todoViewModel::completeFacebookSignIn)
@@ -124,7 +143,8 @@ fun TodoApp(
         }
     }
     BackHandler(enabled = state.screen != AppScreen.Start && state.screen != AppScreen.Home) { viewModel.previous() }
-    when (val screen = state.screen) {
+    Box(Modifier.fillMaxSize()) {
+      when (val screen = state.screen) {
         AppScreen.Start -> StartScreen(viewModel.onboarding.brand, viewModel::next)
         is AppScreen.Onboarding -> OnboardingScreen(
             content = viewModel.onboarding,
@@ -143,18 +163,46 @@ fun TodoApp(
         AppScreen.Login -> LoginScreen(viewModel.content.login, state.loading,
             viewModel::signIn, viewModel::tryAsGuest, viewModel::previous, viewModel::pendingFeature)
         AppScreen.Home -> state.session?.let { user ->
-            HomeScreen(viewModel.content.dashboard, user, viewModel::openProfile) { action ->
-                when (action) {
-                    HomeAction.HOME -> Unit
-                    HomeAction.PROFILE -> viewModel.openProfile()
-                    else -> viewModel.pendingFeature()
-                }
-            }
+            HomeScreen(viewModel.dashboard, user, viewModel::openProfile, viewModel::selectNavigation,
+                viewModel::openTask, viewModel::toggleTask,
+                { category ->
+                    viewModel.filterTasks(if (category == TaskCategory.STUDY) TaskFilter.STUDY else TaskFilter.LIFE)
+                    viewModel.selectNavigation(HomeAction.LIST)
+                }, if (state.taskStatus.loading) TaskDataMessages.LOADING else TaskDataMessages.EMPTY)
         }
         AppScreen.Profile -> state.session?.let { user ->
-            ProfileScreen(viewModel.content.profile.copy(user = user), state.loading,
+            ProfileScreen(viewModel.profileFor(user), state.loading || state.taskStatus.saving,
                 viewModel::previous, viewModel::signOut, viewModel::pendingFeature)
         }
+        AppScreen.TaskList -> TaskListScreen(viewModel.taskContent.list, state.taskBoard,
+            viewModel.content.dashboard.navigation, viewModel::searchTasks, viewModel::filterTasks,
+            viewModel::openTask, viewModel::toggleTask, viewModel::selectNavigation,
+            state.taskStatus, viewModel.taskChangesEnabled, viewModel::refreshTasks)
+        is AppScreen.TaskDetail -> {
+          val task = state.taskBoard.find(screen.taskId)
+          if (task != null && !state.detailStatus.notFound) {
+            TaskDetailScreen(task, viewModel.taskContent.detail, viewModel::previous,
+                { viewModel.toggleTask(task.id) }, { viewModel.toggleSubtask(task.id, it) },
+                { viewModel.addSubtask(task.id, it) }, { title, notes -> viewModel.editTask(task.id, title, notes) },
+                { viewModel.deleteTask(task.id) }, { id, title -> viewModel.editSubtask(task.id, id, title) },
+                { viewModel.deleteSubtask(task.id, it) }, viewModel.detailChangesEnabled)
+          } else TaskDetailUnavailableScreen(viewModel.taskContent.detail.back,
+              state.detailStatus.warning ?: TaskDataMessages.forFailure(vn.edu.uth.todo.model.TaskFailure.NOT_FOUND),
+              viewModel::previous, viewModel::refreshTaskDetail)
+        }
+      }
+      if ((state.screen == AppScreen.Home || state.screen == AppScreen.TaskList ||
+          state.screen is AppScreen.TaskDetail || state.screen == AppScreen.Profile) &&
+          (state.screen != AppScreen.TaskList || state.taskBoard.items.isNotEmpty()) &&
+          !(state.screen is AppScreen.TaskDetail && state.detailStatus.notFound)) {
+          val status = when {
+              state.taskStatus.saving -> state.taskStatus
+              state.screen is AppScreen.TaskDetail && state.detailStatus.loading -> state.taskStatus.copy(loading = true, warning = null)
+              state.screen is AppScreen.TaskDetail && state.detailStatus.warning != null -> state.taskStatus.copy(loading = false, warning = state.detailStatus.warning)
+              else -> state.taskStatus
+          }
+          TaskStatusBanner(status, if (state.screen is AppScreen.TaskDetail) viewModel::refreshTaskDetail else viewModel::refreshTasks)
+      }
     }
     state.notice?.let { notice ->
         AlertDialog(

@@ -1,0 +1,97 @@
+[
+  {
+    "id": 4,
+    "title": "Tập thể dục 30 phút",
+    "note": "",
+    "category": "life",
+    "date": "2026-10-20",
+    "time": "06:30",
+    "priority": "medium",
+    "remind": true,
+    "done": true,
+    "subtasks": []
+  },
+  {
+    "id": 1,
+    "title": "Nộp bài tập Lập trình di động",
+    "note": "Nộp file .zip lên hệ thống của trường. Nhớ kèm ảnh chụp màn hình app.",
+    "category": "study",
+    "date": "2026-10-20",
+    "time": "09:00",
+    "priority": "high",
+    "remind": true,
+    "done": true,
+    "subtasks": [
+      {
+        "title": "Hoàn thiện màn hình đăng nhập",
+        "done": true
+      },
+      {
+        "title": "Chụp ảnh màn hình app",
+        "done": true
+      },
+      {
+        "title": "Nén file và nộp bài",
+        "done": true
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Ôn chương 3 – Cấu trúc dữ liệu",
+    "note": "Tập trung phần cây nhị phân và bảng băm.",
+    "category": "study",
+    "date": "2026-10-20",
+    "time": "14:00",
+    "priority": "medium",
+    "remind": true,
+    "done": false,
+    "subtasks": [
+      {
+        "title": "Đọc lại slide bài giảng",
+        "done": true
+      },
+      {
+        "title": "Làm 10 bài tập cuối chương",
+        "done": false
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Đi chợ mua đồ cho tuần",
+    "note": "",
+    "category": "life",
+    "date": "2026-10-20",
+    "time": "17:30",
+    "priority": "low",
+    "remind": false,
+    "done": false,
+    "subtasks": []
+  },
+  {
+    "id": 6,
+    "title": "Gọi điện về nhà",
+    "note": "",
+    "category": "life",
+    "date": "2026-10-21",
+    "time": "21:00",
+    "priority": "low",
+    "remind": true,
+    "done": false,
+    "subtasks": []
+  },
+  {
+    "id": 5,
+    "title": "Họp nhóm đồ án",
+    "note": "Chuẩn bị phần demo giao diện.",
+    "category": "study",
+    "date": "2026-10-25",
+    "time": "20:00",
+    "priority": "high",
+    "remind": true,
+    "done": false,
+    "subtasks": []
+  }
+]
+

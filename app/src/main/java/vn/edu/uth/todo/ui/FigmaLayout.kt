@@ -3,6 +3,9 @@ package vn.edu.uth.todo.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
@@ -18,6 +21,31 @@ data class DesignFrame(val width: Int, val height: Int) {
     companion object {
         val Splash = DesignFrame(400, 860)
         val Onboarding = DesignFrame(390, 844)
+    }
+}
+
+/** Keep the SVG width and allow taller task details to scroll at their original proportions. */
+@Composable
+fun FigmaScrollableViewport(
+    frame: DesignFrame,
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit
+) {
+    Layout(
+        modifier = modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+        content = { Box(Modifier.fillMaxSize(), content = content) }
+    ) { measurables, constraints ->
+        val designWidth = frame.width.dp.roundToPx()
+        val designHeight = frame.height.dp.roundToPx()
+        val scale = constraints.maxWidth.toFloat() / designWidth
+        val placeable = measurables.single().measure(Constraints.fixed(designWidth, designHeight))
+        layout(constraints.maxWidth, (designHeight * scale).roundToInt()) {
+            placeable.placeWithLayer(0, 0) {
+                scaleX = scale
+                scaleY = scale
+                transformOrigin = TransformOrigin(0f, 0f)
+            }
+        }
     }
 }
 

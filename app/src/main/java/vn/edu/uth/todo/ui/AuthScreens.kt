@@ -5,6 +5,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -131,7 +134,11 @@ fun HomeScreen(
     content: DashboardContent,
     user: UserProfile,
     onProfile: () -> Unit,
-    onAction: (HomeAction) -> Unit
+    onAction: (HomeAction) -> Unit,
+    onTaskOpen: (String) -> Unit = {},
+    onTaskToggle: (String) -> Unit = {},
+    onCategoryOpen: (TaskCategory) -> Unit = {},
+    emptyMessage: String = TaskDataMessages.EMPTY
 ) {
     Box(Modifier.fillMaxSize().background(Surface).testTag("home_screen")) {
         FigmaViewport(DesignFrame.Onboarding) {
@@ -164,14 +171,23 @@ fun HomeScreen(
                 Asset(category.icon, x + 24, 295f, 20f)
                 SvgText(category.title, x + 16, 348.012f, 15, weight = 600)
                 SvgText(category.subtitle, x + 16, 374.778f, 13, TodoDesign.Muted)
+                Box(at(x, 271f, 169f, 123f).clickable(role = Role.Button, onClick = { onCategoryOpen(category.category) })
+                    .semantics { contentDescription = category.title }.testTag("home_category_${category.category.name.lowercase()}"))
             }
             SvgText(content.todayTitle, 20f, 439.983f, 19, weight = 700)
             Box(at(286f, 411f, 88f, 44f).clickable(role = Role.Button, onClick = { onAction(HomeAction.LIST) })) {
                 SvgText(content.allTasks, 8f, 27.145f, 14, TodoDesign.Blue, 500)
             }
-            content.tasks.forEachIndexed { index, task ->
-                val category = content.categories.first { it.category == task.category }
-                TaskCard(task, category, 464f + index * 76) { onAction(HomeAction.LIST) }
+            Box(at(0f, 464f, 390f, 294f).verticalScroll(rememberScrollState())) {
+                Box(Modifier.width(390.dp).height(maxOf(294f, content.tasks.size * 76f - 10).dp)) {
+                    content.tasks.forEachIndexed { index, task ->
+                        val category = content.categories.first { it.category == task.category }
+                        TaskCard(task, category, index * 76f, { onTaskOpen(task.id) }, { onTaskToggle(task.id) })
+                    }
+                    if (content.tasks.isEmpty()) Box(Modifier.fillMaxWidth().padding(top = 60.dp), contentAlignment = Alignment.Center) {
+                        Text(emptyMessage, style = figmaTextStyle(14), color = TodoDesign.Muted, modifier = Modifier.testTag("home_empty"))
+                    }
+                }
             }
             HomeNavigation(content.navigation, onProfile, onAction)
         }
@@ -179,7 +195,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun TaskCard(task: TodoTask, category: CategorySummary, y: Float, onClick: () -> Unit) {
+private fun TaskCard(task: TodoTask, category: CategorySummary, y: Float, onClick: () -> Unit, onToggle: () -> Unit) {
     val study = task.category == TaskCategory.STUDY
     Box(at(20f, y, 350f, 66f).clip(RoundedCornerShape(16.dp)).background(Color.White)
         .clickable(onClick = onClick).testTag("task_${task.id}")) {
@@ -194,6 +210,8 @@ private fun TaskCard(task: TodoTask, category: CategorySummary, y: Float, onClic
                 drawPath(check, Color.White, style = Stroke(1.75.dp.toPx(), cap = StrokeCap.Round))
             } else drawCircle(Color(0xFFC7C7CC), radius = 12.dp.toPx(), style = Stroke(2.dp.toPx()))
         }
+        Box(at(5f, 11f, 44f).toggleable(task.completed, role = Role.Checkbox, onValueChange = { onToggle() })
+            .semantics { contentDescription = task.title }.testTag("home_toggle_${task.id}"))
         SvgText(task.title, 52f, 27.012f, 15,
             if (task.completed) Color(0xFF8A8A8E) else TodoDesign.Ink, 500,
             decoration = if (task.completed) TextDecoration.LineThrough else null, maxWidth = 254f)
@@ -264,7 +282,7 @@ fun ProfileScreen(content: ProfileContent, loading: Boolean, onBack: () -> Unit,
             SvgText(content.weeklyProgress, 288f, 440.778f, 13, TodoDesign.Muted)
             content.week.forEachIndexed { index, day ->
                 val x = 42.2856f + index * 46.5714f
-                val height = day.completed * 18f
+                val height = day.completed.toFloat() / maxOf(4, content.week.maxOfOrNull { it.completed } ?: 4) * 72f
                 Rect(x, 535f - height, 26f, height, 6, when {
                     day.selected -> TodoDesign.Blue
                     index == 0 -> TodoDesign.Blue.copy(alpha = 0.35f)

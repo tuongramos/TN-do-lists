@@ -44,6 +44,8 @@ sealed interface AppScreen {
     data object Login : AppScreen
     data object Home : AppScreen
     data object Profile : AppScreen
+    data object TaskList : AppScreen
+    data class TaskDetail(val taskId: String) : AppScreen
 }
 
 data class OnboardingUiState(

@@ -1,0 +1,29 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "users": {
+      "$uid": {
+        "taskData": {
+          ".read": "auth != null && auth.uid === $uid",
+          ".write": "auth != null && auth.uid === $uid",
+          "initialized": { ".validate": "newData.val() === true" },
+          "tasks": {
+            "$taskId": {
+              ".validate": "newData.hasChildren(['id', 'title', 'category', 'date', 'time', 'done'])",
+              "id": { ".validate": "newData.isString() && newData.val() === $taskId" },
+              "title": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 500" },
+              "category": { ".validate": "newData.val() === 'study' || newData.val() === 'life'" },
+              "date": { ".validate": "newData.isString()" },
+              "time": { ".validate": "newData.isString()" },
+              "done": { ".validate": "newData.isBoolean()" },
+              "remind": { ".validate": "newData.isBoolean()" },
+              "note": { ".validate": "newData.isString()" },
+              "priority": { ".validate": "newData.val() === 'low' || newData.val() === 'medium' || newData.val() === 'high'" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

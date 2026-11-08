@@ -1,0 +1,64 @@
+ .firebaserc                                        |   5 [32m+[m
+ README.md                                          |  30 [32m+[m[31m-[m
+ app/build.gradle.kts                               |  15 [32m+[m
+ .../java/vn/edu/uth/todo/TaskDetailFlowTest.kt     | 199 [32m++++++++++[m
+ .../java/vn/edu/uth/todo/TaskDetailLiveUiTest.kt   |  45 [32m+++[m
+ .../java/vn/edu/uth/todo/TaskListLiveUiTest.kt     |  56 [32m+++[m
+ .../vn/edu/uth/todo/TaskLiveIntegrationTest.kt     |  66 [32m++++[m
+ .../java/vn/edu/uth/todo/TaskScreensTest.kt        | 170 [32m+++++++++[m
+ .../java/vn/edu/uth/todo/TaskSyncUiTest.kt         | 300 [32m+++++++++++++++[m
+ app/src/main/java/vn/edu/uth/todo/MainActivity.kt  |  68 [32m+++[m[31m-[m
+ .../java/vn/edu/uth/todo/data/FirebaseTaskStore.kt | 110 [32m++++++[m
+ app/src/main/java/vn/edu/uth/todo/data/TaskApi.kt  | 150 [32m++++++++[m
+ .../main/java/vn/edu/uth/todo/data/TaskCache.kt    |  29 [32m++[m
+ .../main/java/vn/edu/uth/todo/data/TaskRecords.kt  |  38 [32m++[m
+ .../java/vn/edu/uth/todo/data/TaskRepository.kt    |  47 [32m+++[m
+ .../vn/edu/uth/todo/data/TaskSyncRepository.kt     | 103 [32m+++++[m
+ .../java/vn/edu/uth/todo/model/OnboardingModels.kt |   2 [32m+[m
+ .../java/vn/edu/uth/todo/model/TaskDataModels.kt   |  47 [32m+++[m
+ .../java/vn/edu/uth/todo/model/TaskDetailState.kt  |  15 [32m+[m
+ .../java/vn/edu/uth/todo/model/TaskListState.kt    |  22 [32m++[m
+ .../main/java/vn/edu/uth/todo/model/TaskModels.kt  |  76 [32m++++[m
+ .../java/vn/edu/uth/todo/model/TaskStatistics.kt   |  69 [32m++++[m
+ .../main/java/vn/edu/uth/todo/model/TodoModels.kt  |  11 [32m+[m[31m-[m
+ .../main/java/vn/edu/uth/todo/ui/AuthScreens.kt    |  30 [32m+[m[31m-[m
+ .../main/java/vn/edu/uth/todo/ui/FigmaLayout.kt    |  28 [32m++[m
+ .../main/java/vn/edu/uth/todo/ui/TaskScreens.kt    | 423 [32m+++++++++++++++++++++[m
+ .../java/vn/edu/uth/todo/ui/TaskStatusBanner.kt    |  44 [32m+++[m
+ .../main/java/vn/edu/uth/todo/ui/TodoViewModel.kt  | 311 [32m++++++++++++++[m[31m-[m
+ app/src/main/res/drawable-nodpi/task_calendar.png  | Bin [31m0[m -> [32m870[m bytes
+ app/src/main/res/drawable-nodpi/task_edit.png      | Bin [31m0[m -> [32m724[m bytes
+ app/src/main/res/drawable-nodpi/task_nav_home.png  | Bin [31m0[m -> [32m1054[m bytes
+ app/src/main/res/drawable-nodpi/task_nav_list.png  | Bin [31m0[m -> [32m535[m bytes
+ app/src/main/res/drawable-nodpi/task_plus.png      | Bin [31m0[m -> [32m404[m bytes
+ app/src/main/res/drawable-nodpi/task_reminder.png  | Bin [31m0[m -> [32m1230[m bytes
+ app/src/main/res/drawable-nodpi/task_repeat.png    | Bin [31m0[m -> [32m997[m bytes
+ app/src/main/res/drawable-nodpi/task_search.png    | Bin [31m0[m -> [32m1138[m bytes
+ app/src/main/res/drawable-nodpi/task_trash.png     | Bin [31m0[m -> [32m1027[m bytes
+ .../vn/edu/uth/todo/TaskApiAndStatisticsTest.kt    |  87 [32m+++++[m
+ app/src/test/java/vn/edu/uth/todo/TaskBoardTest.kt |  47 [32m+++[m
+ .../test/java/vn/edu/uth/todo/TaskDetailApiTest.kt | 167 [32m++++++++[m
+ .../test/java/vn/edu/uth/todo/TaskListStateTest.kt |  37 [32m++[m
+ .../java/vn/edu/uth/todo/TaskSyncRepositoryTest.kt | 109 [32m++++++[m
+ app/src/test/resources/tasks-api-sample.json       |  97 [32m+++++[m
+ database.rules.json                                |  29 [32m++[m
+ docs/API-REALTIME-DATABASE.md                      | 115 [32m++++++[m
+ docs/TASK-DETAIL-FLOW.md                           |  69 [32m++++[m
+ docs/TASK-LIST-FLOW.md                             |  63 [32m+++[m
+ docs/TASK-SCREENS.md                               |  75 [32m++++[m
+ docs/figma/tasks/detail.svg                        |  93 [32m+++++[m
+ docs/figma/tasks/list.svg                          | 141 [32m+++++++[m
+ docs/figma/tasks/reference_detail.png              | Bin [31m0[m -> [32m46922[m bytes
+ docs/figma/tasks/reference_list.png                | Bin [31m0[m -> [32m53455[m bytes
+ docs/screenshots/task_detail.png                   | Bin [31m0[m -> [32m117501[m bytes
+ docs/screenshots/task_detail_api.png               | Bin [31m0[m -> [32m114720[m bytes
+ docs/screenshots/task_list.png                     | Bin [31m0[m -> [32m142478[m bytes
+ docs/screenshots/task_list_api.png                 | Bin [31m0[m -> [32m141876[m bytes
+ docs/tasks-comparison.png                          | Bin [31m0[m -> [32m284734[m bytes
+ docs/tasks-preview.png                             | Bin [31m0[m -> [32m183639[m bytes
+ docs/tasks-visual-comparison.json                  |  22 [32m++[m
+ firebase.json                                      |   5 [32m+[m
+ local.properties.example                           |   4 [32m+[m
+ tools/compare-task-screens.py                      |  47 [32m+++[m
+ tools/export-task-assets.cjs                       |  42 [32m++[m
+ 63 files changed, 3728 insertions(+), 30 deletions(-)

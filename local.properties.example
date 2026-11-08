@@ -1,0 +1,4 @@
+# Keep the machine-specific local.properties file out of Git.
+sdk.dir=D\:\\Androidstudio\\Sdk
+tasks.api.token=YOUR_BEARER_TOKEN
+firebase.database.url=https://to-do-lists-a558c-default-rtdb.asia-southeast1.firebasedatabase.app

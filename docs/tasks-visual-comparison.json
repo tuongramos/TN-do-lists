@@ -1,0 +1,22 @@
+[
+  {
+    "screen": "list",
+    "frame": [
+      390,
+      844
+    ],
+    "mean_absolute_rgb_error": 2.384,
+    "rgb_similarity_percent": 99.07,
+    "pixels_with_all_channels_within_24_percent": 97.22
+  },
+  {
+    "screen": "detail",
+    "frame": [
+      390,
+      941
+    ],
+    "mean_absolute_rgb_error": 2.243,
+    "rgb_similarity_percent": 99.12,
+    "pixels_with_all_channels_within_24_percent": 97.33
+  }
+]

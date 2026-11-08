@@ -1,6 +1,16 @@
 # UTH Todo — Navigation + OOP + giao diện Authentication
 
-Dự án Kotlin / Jetpack Compose gồm **7 màn**: Start, 3 màn onboarding, đăng nhập Google/Facebook, trang chủ và hồ sơ. Ba màn mới dùng các SVG người dùng gửi ngày 02/11/2026. **Google và Facebook đã được nối với Firebase Authentication**. Google dùng Credential Manager; Facebook dùng Meta SDK và App ID/Client Token đã cung cấp. Hoàn tất cấu hình nền tảng Android trong Meta và bật Facebook provider trong Firebase theo `docs/FACEBOOK-SIGN-IN.md` trước khi thử tài khoản thật.
+Dự án Kotlin / Jetpack Compose gồm **9 màn**: Start, 3 màn onboarding, đăng nhập Google/Facebook, trang chủ, hồ sơ, danh sách và chi tiết công việc. Hai màn công việc dùng SVG người dùng gửi ngày 07/11/2026. **Google và Facebook đã được nối với Firebase Authentication**. Google dùng Credential Manager; Facebook dùng Meta SDK và App ID/Client Token đã cung cấp. Cấu hình provider và cách thử tài khoản thật ở `docs/GOOGLE-SIGN-IN.md` và `docs/FACEBOOK-SIGN-IN.md`.
+
+**Cập nhật 08/11/2026:** danh sách công việc lấy từ API `https://share.tryapps.store/mock/teach/tasks`, khởi tạo một lần và lưu thay đổi riêng từng tài khoản bằng **Firebase Realtime Database**. Trang chủ và hồ sơ tính thống kê từ cùng danh sách; có tải/lỗi/thử lại và cache riêng theo UID. Cấu hình token, đường dẫn database, quy tắc ngày của dữ liệu mẫu và cách kiểm tra nằm trong [API-REALTIME-DATABASE.md](docs/API-REALTIME-DATABASE.md).
+
+Flow **Danh sách (UI + API)** được hoàn thiện trong [TASK-LIST-FLOW.md](docs/TASK-LIST-FLOW.md): tải khi mở tab, tìm kiếm không dấu kết hợp danh mục, phân biệt tải/lỗi/trống/không có kết quả, hoàn thành/mở lại có xác nhận Firebase và giữ tìm kiếm/bộ lọc khi quay lại từ chi tiết.
+
+Xác minh flow Danh sách: **41 unit test + 24 test UI + 3 test tích hợp thật đạt**, build thành công, Lint 0 lỗi. Đối chiếu lại bố cục Danh sách với SVG đạt **99.07% tương đồng RGB**. [Ảnh Danh sách dùng dữ liệu Firebase thật](docs/screenshots/task_list_api.png).
+
+Flow **Chi tiết (UI + API)**: GET/PATCH/DELETE theo ID, lưu bền vững vào Firebase và **quay lại Danh sách** cả khi mở từ Trang chủ. Xem hợp đồng API, phản hồi mẫu của server và cách xử lý lỗi tại [TASK-DETAIL-FLOW.md](docs/TASK-DETAIL-FLOW.md).
+
+Xác minh flow Chi tiết: **49 unit test + 34 test UI + 4 test tích hợp thật đạt**, build thành công, Lint 0 lỗi. Chi tiết đối chiếu lại với SVG đạt **99.12% tương đồng RGB**. [Ảnh Chi tiết dùng dữ liệu Firebase thật](docs/screenshots/task_detail_api.png).
 
 ## Mở và chạy trong Android Studio
 
@@ -21,11 +31,14 @@ SDK hiện tại được cấu hình bằng `local.properties`: `D:\Androidstud
 - **Google** mở Credential Manager, xác thực ID token với Firebase, rồi vào trang chủ khi thành công. Hủy sẽ giữ màn đăng nhập; lỗi hiển thị hộp thoại có thể thử lại.
 - **Facebook** mở đăng nhập bằng Meta SDK, lấy access token rồi xác thực với Firebase. Thành công mở trang chủ, hủy giữ màn đăng nhập, lỗi có thể thử lại.
 - Bản sửa lỗi `Invalid Scopes: email` chỉ yêu cầu `public_profile` trên Facebook. Nếu provider không chia sẻ email, hồ sơ hiển thị thông báo tương ứng; UID/tên vẫn lấy từ tài khoản thật.
-- **Dùng thử không cần tài khoản** mở trang chủ bằng dữ liệu mẫu. Nhấn avatar hoặc Cài đặt để mở hồ sơ; Đăng xuất trở về đăng nhập.
+- **Dùng thử không cần tài khoản** mở trang chủ bằng dữ liệu API/cache riêng trên thiết bị, không ghi Firebase. Nhấn avatar hoặc Cài đặt để mở hồ sơ; Đăng xuất trở về đăng nhập.
 - Hồ sơ dùng thử hiển thị nhãn **Chế độ dùng thử**. Compose Preview dùng dữ liệu Google trong SVG để đối chiếu bản thiết kế.
 - Khi `AuthRepository` trả về thành công, ứng dụng thông báo thành công, mở trang chủ và hiển thị thông tin người dùng được trả về; lỗi hiển thị hộp thoại, hủy giữ nguyên màn đăng nhập.
 - ViewModel và SavedStateHandle giữ trang hiện tại khi Activity được tạo lại. Lần khởi động mới khôi phục người dùng từ Firebase Auth; người đã đăng nhập vào thẳng trang chủ. Đăng xuất xóa phiên Firebase, phiên Meta SDK và yêu cầu xóa trạng thái Credential Manager.
-- Các chức năng ngoài ba màn mới như thêm việc, danh sách riêng, sửa hồ sơ và đồng bộ chỉ thông báo phạm vi bài tiếp theo.
+- **Danh sách** ở thanh điều hướng và **Xem tất cả** trên Trang chủ mở màn danh sách mới: tìm kiếm có/không dấu, lọc Học tập/Cuộc sống và đánh dấu hoàn thành.
+- Nhấn bất kỳ công việc trên Trang chủ hoặc Danh sách để mở đúng chi tiết: hạn chót, nhắc nhở, lặp lại, ghi chú và việc nhỏ. Có thể sửa tên/ghi chú, thêm/sửa/xóa hoặc hoàn thành việc nhỏ, đánh dấu hoàn thành và xóa công việc sau xác nhận.
+- Các công việc dùng chung đối tượng dữ liệu; ViewModel và SavedStateHandle giữ bộ lọc, tìm kiếm và công việc đang mở khi Android khôi phục Activity. Người đăng nhập đọc/lưu Realtime Database tại `users/{uid}/taskData`; thay đổi được lắng nghe realtime. Dữ liệu đã sửa/xóa không bị API ghi đè khi mở lại.
+- Thêm công việc lớn và sửa hồ sơ vẫn thông báo phạm vi bài tiếp theo.
 
 ## OOP
 
@@ -43,6 +56,11 @@ SDK hiện tại được cấu hình bằng `local.properties`: `D:\Androidstud
 | `FirebaseAuthRepository`, `AuthUserMapper` | Xác thực token Google, khôi phục phiên và ánh xạ người dùng thật |
 | `GoogleCredentialManagerClient`, `GoogleSignInRequest`, `GoogleSignInResult` | Mở chọn tài khoản ở UI; truyền kết quả một lần về ViewModel |
 | `FacebookSignInClient`, `FacebookSignInRequest`, `FacebookSignInResult` | Activity Result API cho Meta SDK; chuyển access token về repository để Firebase xác thực |
+| `TaskItem`, `Subtask`, `TaskBoard`, `TaskFilter`, `TaskPriority` | Đối tượng công việc, việc nhỏ, tiến độ, tìm kiếm và lọc danh sách |
+| `TaskRepository`, `FigmaTaskRepository`, `TaskContent` | Nội dung và 6 công việc mẫu cho danh sách/chi tiết từ SVG |
+| `TaskApi`, `MockTaskApi`, `ApiTaskDto`, `ApiSubtaskDto` | Lấy và ánh xạ dữ liệu API thực, không phụ thuộc Composable |
+| `TaskSyncRepository`, `ApiFirebaseTaskRepository`, `FirebaseTaskStore`, `TaskCache` | Khởi tạo API một lần, đồng bộ Realtime Database, cache theo UID |
+| `TaskStatisticsCalculator`, `TaskDataStatus` | Thống kê từ dữ liệu và trạng thái tải/lưu/lỗi |
 | `DesignFrame`, `TodoDesign` | Kích thước, màu sắc và kiểu chữ dùng chung |
 
 UI nhận đối tượng nội dung và callback. Tài nguyên minh họa là hình trang trí trích từ SVG gốc.
@@ -82,5 +100,11 @@ Phần Facebook, Key Hash Android và cấu hình Meta/Firebase còn cần hoàn
 Có thể tái xuất tài nguyên bằng `node tools/export-figma-assets.cjs` sau khi cài `@resvg/resvg-js@2.6.2` trong `tools/`. Công cụ này chỉ dùng khi phát triển; ứng dụng Android không cần Node.js.
 
 Tài nguyên ba màn mới: `node tools/export-auth-assets.cjs`.
+
+Thông số và cách thử hai màn công việc: `docs/TASK-SCREENS.md`. Xuất icon/tham chiếu: `node tools/export-task-assets.cjs`; đối chiếu ảnh: `python tools/compare-task-screens.py`.
+
+Bản công việc ngày 07/11/2026: build thành công, **25 unit test + 9 test công việc + 14 test hồi quy Google/Facebook đạt**, lint 0 lỗi. Ảnh mới: `docs/tasks-preview.png`, đối chiếu: `docs/tasks-comparison.png`; tương đồng theo sai số RGB lần lượt 99.07% và 99.12%.
+
+Bản API + Realtime Database ngày 08/11/2026: **39 unit test, 30 test giao diện và 3 test tích hợp thật đạt**; đã chạy lại 7 test đồng bộ sau bản sửa xử lý quyền ghi, đều đạt. APK/debug Android test build thành công, Lint **0 lỗi, 16 cảnh báo**. GET API thật đạt trên cả máy phát triển và Android. Sau khi người dùng đăng nhập Google trên máy ảo, đã xác nhận ghi/đọc/xóa một công việc tạm của chính tài khoản, bảo toàn các ID công việc ban đầu và chặn đọc UID khác. Đã xử lý cả lỗi quyền dạng `Exception` thường mà `DatabaseReference.get()` có thể trả về. Token thật chỉ nằm trong cấu hình local bị Git bỏ qua.
 
 Font phát hành theo SIL Open Font License, xem `docs/FONT-LICENSE.txt` và [kho Google Fonts](https://github.com/google/fonts/tree/main/ofl/bevietnampro).
