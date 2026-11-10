@@ -22,7 +22,8 @@ class TodoViewModel(
     private val authRepository: AuthRepository,
     repository: TodoRepository,
     taskRepository: TaskRepository = FigmaTaskRepository(),
-    private val taskSyncRepository: TaskSyncRepository? = null
+    private val taskSyncRepository: TaskSyncRepository? = null,
+    private val notificationSettings: NotificationSettings? = null
 ) : ViewModel() {
     constructor(savedState: SavedStateHandle) : this(savedState, UnconfiguredAuthRepository(), FigmaTodoRepository())
 
@@ -288,7 +289,7 @@ class TodoViewModel(
         if (uiState.loading) return
         savedState["guest"] = true
         uiState = uiState.copy(session = content.profile.user.copy(id = "guest", provider = null, isGuest = true),
-            notice = null, announcement = content.labels.guestMessage)
+            notice = null, announcement = content.labels.guestMessage, showNotificationPrompt = false)
         navigate(AppScreen.Home)
         refreshTasks()
     }
@@ -304,8 +305,48 @@ class TodoViewModel(
                 if (!uiState.taskStatus.loading) refreshTasks()
             }
             HomeAction.PROFILE -> openProfile()
-            else -> pendingFeature()
+            HomeAction.NOTIFICATIONS -> openNotifications()
+            HomeAction.ADD -> pendingFeature()
         }
+    }
+
+    private fun notificationOwner(): String? = uiState.session?.let { user ->
+        if (user.isGuest) "guest" else "account:${user.id}"
+    }
+
+    private fun openNotifications() {
+        val owner = notificationOwner() ?: return
+        val settings = notificationSettings ?: return
+        uiState = if (settings.isEnabled(owner)) {
+            val message = if (settings.canPostNotifications()) NotificationCopy.ENABLED else NotificationCopy.SYSTEM_BLOCKED
+            uiState.copy(showNotificationPrompt = false, announcement = message)
+        } else {
+            uiState.copy(showNotificationPrompt = true)
+        }
+    }
+
+    fun dismissNotificationPrompt() {
+        uiState = uiState.copy(showNotificationPrompt = false)
+    }
+
+    fun beginNotificationOptIn(): String? {
+        if (!uiState.showNotificationPrompt) return null
+        val owner = notificationOwner() ?: return null
+        val settings = notificationSettings ?: return null
+        dismissNotificationPrompt()
+        if (settings.canPostNotifications()) {
+            completeNotificationOptIn(owner, granted = true)
+            return null
+        }
+        return owner
+    }
+
+    fun completeNotificationOptIn(owner: String, granted: Boolean) {
+        if (owner != notificationOwner()) return
+        val settings = notificationSettings ?: return
+        val enabled = granted && settings.canPostNotifications()
+        if (enabled) settings.setEnabled(owner, true)
+        uiState = uiState.copy(announcement = if (enabled) NotificationCopy.ENABLED else NotificationCopy.SYSTEM_BLOCKED)
     }
 
     fun openTask(id: String) {
@@ -468,9 +509,12 @@ class TodoViewModel(
 
     companion object {
         fun factory(auth: AuthRepository, repository: TodoRepository = FigmaTodoRepository(),
-            sync: TaskSyncRepository? = null): ViewModelProvider.Factory =
+            sync: TaskSyncRepository? = null, notifications: NotificationSettings? = null): ViewModelProvider.Factory =
             viewModelFactory {
-                initializer { TodoViewModel(createSavedStateHandle(), auth, repository, taskSyncRepository = sync) }
+                initializer {
+                    TodoViewModel(createSavedStateHandle(), auth, repository, taskSyncRepository = sync,
+                        notificationSettings = notifications)
+                }
             }
     }
 }

@@ -127,5 +127,6 @@ data class TodoUiState(
     val facebookSignInRequest: FacebookSignInRequest? = null,
     val taskBoard: TaskBoard = TaskBoard(emptyList()),
     val taskStatus: TaskDataStatus = TaskDataStatus(),
-    val detailStatus: TaskDetailStatus = TaskDetailStatus()
+    val detailStatus: TaskDetailStatus = TaskDetailStatus(),
+    val showNotificationPrompt: Boolean = false
 )

@@ -1,12 +1,21 @@
 package vn.edu.uth.todo
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -15,6 +24,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -24,6 +35,7 @@ import vn.edu.uth.todo.auth.GoogleCredentialManagerClient
 import vn.edu.uth.todo.auth.FacebookSignInClient
 import com.facebook.login.LoginManager
 import vn.edu.uth.todo.data.FirebaseAuthRepository
+import vn.edu.uth.todo.data.DeviceNotificationSettings
 import vn.edu.uth.todo.model.AppScreen
 import vn.edu.uth.todo.model.HomeAction
 import vn.edu.uth.todo.model.GoogleAuthMessages
@@ -33,6 +45,7 @@ import vn.edu.uth.todo.model.FacebookSignInRequest
 import vn.edu.uth.todo.model.FacebookSignInResult
 import vn.edu.uth.todo.ui.HomeScreen
 import vn.edu.uth.todo.ui.LoginScreen
+import vn.edu.uth.todo.ui.NotificationPermissionDialog
 import vn.edu.uth.todo.ui.ProfileScreen
 import vn.edu.uth.todo.ui.OnboardingScreen
 import vn.edu.uth.todo.ui.TodoViewModel
@@ -65,7 +78,8 @@ class MainActivity : ComponentActivity() {
         val tasks = ApiFirebaseTaskRepository(MockTaskApi(TaskApiConfiguration(BuildConfig.TASKS_API_TOKEN)),
             FirebaseTaskStore { TaskFirebaseDatabase.instance(BuildConfig.FIREBASE_DATABASE_URL) },
             SharedPreferencesTaskCache(applicationContext))
-        val factory = TodoViewModel.factory(authRepository, sync = tasks)
+        val factory = TodoViewModel.factory(authRepository, sync = tasks,
+            notifications = DeviceNotificationSettings(applicationContext))
         val todoViewModel = ViewModelProvider(this, factory)[TodoViewModel::class.java]
         val facebookClient = FacebookSignInClient(this, todoViewModel.uiState.facebookSignInRequest?.id,
             todoViewModel::completeFacebookSignIn)
@@ -104,6 +118,13 @@ fun TodoApp(
     onFacebookSignIn: ((FacebookSignInRequest) -> Unit)? = null
 ) {
     val state = viewModel.uiState
+    val context = LocalContext.current
+    var pendingNotificationOwner by rememberSaveable { mutableStateOf<String?>(null) }
+    val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        val owner = pendingNotificationOwner
+        pendingNotificationOwner = null
+        if (owner != null) viewModel.completeNotificationOptIn(owner, granted)
+    }
     LaunchedEffect(state.screen) {
         if (state.screen == AppScreen.Start) {
             delay(2_400)
@@ -203,6 +224,22 @@ fun TodoApp(
           }
           TaskStatusBanner(status, if (state.screen is AppScreen.TaskDetail) viewModel::refreshTaskDetail else viewModel::refreshTasks)
       }
+    }
+    if (state.showNotificationPrompt) {
+        NotificationPermissionDialog(
+            onAllow = allow@{
+                if (pendingNotificationOwner != null) return@allow
+                val owner = viewModel.beginNotificationOptIn() ?: return@allow
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    pendingNotificationOwner = owner
+                    notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                } else {
+                    viewModel.completeNotificationOptIn(owner, granted = false)
+                }
+            },
+            onLater = viewModel::dismissNotificationPrompt
+        )
     }
     state.notice?.let { notice ->
         AlertDialog(

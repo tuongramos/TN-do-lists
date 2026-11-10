@@ -150,7 +150,8 @@ fun HomeScreen(
             SvgText(content.greetingFor(user),
                 80f, 103.82f, 24, weight = 700, tracking = -0.3f, maxWidth = 238f)
             Box(at(326f, 63f, 44f).background(Color.White, CircleShape)
-                .clickable(role = Role.Button, onClick = { onAction(HomeAction.NOTIFICATIONS) })) {
+                .clickable(role = Role.Button, onClick = { onAction(HomeAction.NOTIFICATIONS) })
+                .semantics { contentDescription = NotificationCopy.TITLE }.testTag("home_notifications")) {
                 Asset(R.drawable.home_bell, 11f, 10f, 24f)
             }
             Rect(20f, 130f, 350f, 121f, 22, TodoDesign.Blue)
